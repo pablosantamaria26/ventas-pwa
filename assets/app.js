@@ -160,19 +160,43 @@ async function saveVisit(c,bought){
 
 function renderCatalogo(){
   const view = el('#view');
-  const arr = state.products || [];
-  if(!arr.length){
-    view.innerHTML = `<div class="card">Aún no hay catálogo cargado 📦</div>`;
+
+  if(!state.products || !state.products.length){
+    view.innerHTML = `<div class="card">Aún no hay productos cargados 📦</div>`;
     return;
   }
-  view.innerHTML = `<div class="list">` + arr.map(p=>`
+
+  view.innerHTML = `
     <div class="card">
-      ${p.imageUrl ? `<img src="${p.imageUrl}" style="width:100%;max-height:200px;object-fit:cover;border-radius:12px;margin-bottom:8px">` : ''}
-      <strong>${p.name}</strong>
-      <div class="badge">${p.currency||'ARS'} ${Number(p.price||0).toFixed(2)}</div>
+      <input id="searchProd" class="input" placeholder="Buscar producto..." />
     </div>
-  `).join('') + `</div>`;
+    <div id="catalogoGrid" class="grid"></div>
+  `;
+
+  const grid = el('#catalogoGrid');
+  const paint = (arr) => grid.innerHTML = arr.map(p=>`
+    <div class="card" style="text-align:center">
+      ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}" style="width:100%;max-height:180px;object-fit:cover;border-radius:12px;margin-bottom:8px;">` : ''}
+      <strong>${p.name}</strong><br>
+      <small>${p.category || ''}</small><br>
+      <span class="badge">${p.currency || 'ARS'} ${Number(p.price||0).toFixed(2)}</span>
+    </div>
+  `).join('');
+
+  // Mostrar todos los productos
+  paint(state.products);
+
+  // Filtro por texto
+  el('#searchProd').oninput = e => {
+    const q = e.target.value.toLowerCase();
+    const filtered = state.products.filter(p =>
+      (p.name || '').toLowerCase().includes(q) ||
+      (p.category || '').toLowerCase().includes(q)
+    );
+    paint(filtered);
+  };
 }
+
 
 /* ===== INIT ===== */
 (function(){
