@@ -10,7 +10,7 @@ window.addEventListener('online', ()=> { if(state.user) syncQueue(state.user); }
 function renderGoogleBtn(){
   if(state.user) { el('#googleBtn').innerHTML=''; return; }
   google.accounts.id.initialize({
-    client_id: 'TU_CLIENT_ID.apps.googleusercontent.com',
+  client_id: '135553402753-v9hml0v9licfiunmp6k5nf5067cnompa.apps.googleusercontent.com',
     callback: async (resp)=>{
       const { ok, user, error } = await api.gsiLogin(resp.credential);
       if(!ok){ alert('Login falló: '+error); return; }
