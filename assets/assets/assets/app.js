@@ -113,3 +113,47 @@ function renderClientes(){
   });
 }
 
+function renderRuta(){
+  if(!state.clients.length){
+    el('#view').innerHTML = `<div class="card">Cargar clientes</div>`;
+    return;
+  }
+  state.step = 0;
+  openTarjeta(state.clients[state.step]);
+}
+
+function openTarjeta(c){
+  const view = el('#view');
+  const tel = c.phone||'';
+  view.innerHTML = `
+    <div class="card big">
+      <h2>${c.name}</h2>
+      <div class="badge">${c.city||''}</div>
+      <textarea id="nota" class="input" placeholder="Notas visita"></textarea>
+
+      <button id="btnCompro">✅ Compró</button>
+      <button id="btnNoCompro">❌ No compró</button>
+
+      <button id="btnMapa">📍 Mapa</button>
+      <button id="btnWhats">💬 WhatsApp</button>
+
+      <button id="btnSiguiente">➡️ Siguiente</button>
+    </div>
+  `;
+
+  el('#btnCompro').onclick = ()=> saveVisit(c,true);
+  el('#btnNoCompro').onclick = ()=> saveVisit(c,false);
+  el('#btnMapa').onclick = ()=> window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.address||'')},${encodeURIComponent(c.city||'')}`);
+  el('#btnWhats').onclick = ()=> window.open(`https://wa.me/${tel}`);
+  el('#btnSiguiente').onclick = ()=>{
+    state.step = (state.step+1) % state.clients.length;
+    openTarjeta(state.clients[state.step]);
+  };
+}
+
+async function saveVisit(c,bought){
+  const note = el('#nota').value;
+  const payload = { email: state.user.email, clientId:c.id, note, bought };
+  try{ await api.post('visit', payload); alert('Guardado ✅'); }
+  catch(e){ queue.push({route:'visit', payload}); alert('Sin conexión, se sincroniza ✅'); }
+}
