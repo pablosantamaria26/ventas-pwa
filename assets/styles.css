@@ -18,4 +18,9 @@ body{ margin:0; font-family:system-ui, sans-serif; background:var(--bg); color:v
 .gbtn{ display:flex; justify-content:center; margin:12px; }
 .actions{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
 .actions button{ padding:12px; }
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));
+  gap:12px;
+}
 
