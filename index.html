@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vendedores PWA</title>
+
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="stylesheet" href="./assets/styles.css" />
+
+  <!-- Google Identity Services (para Google Sign-In) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <h1>Vendedores</h1>
+    <button id="btnInstall" hidden>Instalar</button>
+  </header>
+
+  <main id="app" class="container"></main>
+
+  <div id="googleBtn" class="gbtn"></div>
+
+  <script src="./assets/api.js"></script>
+  <script src="./assets/app.js"></script>
+  <script>
+    if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js'); }
+  </script>
+</body>
+</html>
