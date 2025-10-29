@@ -157,3 +157,38 @@ async function saveVisit(c,bought){
   try{ await api.post('visit', payload); alert('Guardado ✅'); }
   catch(e){ queue.push({route:'visit', payload}); alert('Sin conexión, se sincroniza ✅'); }
 }
+
+function renderCatalogo(){
+  const view = el('#view');
+  const arr = state.products || [];
+  if(!arr.length){
+    view.innerHTML = `<div class="card">Aún no hay catálogo cargado 📦</div>`;
+    return;
+  }
+  view.innerHTML = `<div class="list">` + arr.map(p=>`
+    <div class="card">
+      ${p.imageUrl ? `<img src="${p.imageUrl}" style="width:100%;max-height:200px;object-fit:cover;border-radius:12px;margin-bottom:8px">` : ''}
+      <strong>${p.name}</strong>
+      <div class="badge">${p.currency||'ARS'} ${Number(p.price||0).toFixed(2)}</div>
+    </div>
+  `).join('') + `</div>`;
+}
+
+/* ===== INIT ===== */
+(function(){
+  const saved = localStorage.getItem('user');
+  if(saved){
+    state.user=JSON.parse(saved);
+    Promise.all([
+      api.clients(state.user.token),
+      api.products(),
+      api.stats(state.user.token)
+    ]).then(([c,p,s])=>{
+      state.clients=c.data||[];
+      state.products=p.data||[];
+      state.stats=s;
+      render();
+    });
+  }
+  render();
+})();
