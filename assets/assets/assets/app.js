@@ -65,5 +65,51 @@ function render(){
   if(state.tab==='catalogo') renderCatalogo();
 }
 
-/* … EL RESTO DEL CÓDIGO EXISTE COMPLETO Y TE LO PASO EN LA SIGUIENTE RESPUESTA
-   para no saturarte de golpe 🤝 ✅ */
+function renderClientes(){
+  const view = el('#view');
+  view.innerHTML = `
+    <div class="card">
+      <div class="row grid-2">
+        <input id="fCli" class="input" placeholder="Buscar cliente..." />
+        <button id="btnRecalc">Cercanía</button>
+      </div>
+    </div>
+    <div id="cliList" class="list"></div>`;
+  
+  const list = el('#cliList');
+  const paint = (arr)=> list.innerHTML = arr.map(c=>`
+    <div class="card">
+      <strong>${c.name||'-'}</strong>
+      <div class="badge">${c.city||''}</div>
+      <div class="row grid-2">
+        <button class="btnVisita" data-id="${c.id}">Visita</button>
+        <button onclick="window.open('https://wa.me/${c.phone||''}','_blank')">WhatsApp</button>
+      </div>
+    </div>`).join('');
+
+  paint(state.clients);
+
+  el('#fCli').oninput = e=>{
+    const t = e.target.value.toLowerCase();
+    paint(state.clients.filter(c => (c.name||'').toLowerCase().includes(t)));
+  };
+
+  el('#btnRecalc').onclick = ()=>{
+    if(!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(pos=>{
+      const me = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      const arr = [...state.clients]
+        .map(c=>({ ...c, _d: km(me, {lat:Number(c.geoLat), lng:Number(c.geoLng)}) }))
+        .sort((a,b)=>a._d-b._d);
+      paint(arr);
+    });
+  };
+
+  list.addEventListener('click', ev=>{
+    if(!ev.target.classList.contains('btnVisita')) return;
+    const id = ev.target.dataset.id;
+    const c = state.clients.find(x=>x.id===id);
+    openTarjeta(c);
+  });
+}
+
